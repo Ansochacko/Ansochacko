@@ -1,5 +1,5 @@
 <!-- cards:start -->
-<a href="https://ansochacko.com/"><img src="cards/hero.svg" width="100%" alt="Anso Chacko. I build websites and web apps, from independent guides to working life in Europe to privacy-first browser tools, and ship them."></a>
+<a href="https://ansochacko.com/"><img src="cards/hero.svg" width="100%" alt="Anso Chacko. I build websites and web apps: guides to working life in Europe and privacy-first browser tools."></a>
 
 <img src="cards/heatmap.svg" width="100%" alt="Contribution graph for the last year">
 
