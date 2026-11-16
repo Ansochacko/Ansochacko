@@ -40,9 +40,9 @@ GH = "https://github.com/Ansochacko"
 PROFILE = {
     "first": "Anso",
     "last": "Chacko",
-    "label": "Builder · websites & web apps",
-    "line": "I build websites and web apps: guides to working life in Europe and "
-            "privacy-first browser tools.",
+    "label": "Web developer · Finland · open to work",
+    "line": "I build and ship web apps: a free file-resizer and guides to working life "
+            "in Europe.",
     "site": "ansochacko.com",
     "href": "https://ansochacko.com/",
     # Drawn as a line engraving. Any portrait on a plain light background works best.
@@ -50,47 +50,62 @@ PROFILE = {
     "portrait": ROOT / "assets" / "portrait.jpg",
     # Crop box as fractions of the image (left, top, right, bottom): head and shoulders.
     # Keep width/height near 0.92 (the portrait frame's shape) so the face isn't stretched.
-    "crop": (0.11, 0.04, 0.89, 0.89),
+    "crop": (0.02, 0.15, 0.80, 1.0),
     # Tone levels (black point, white point). Raise the white point to fade out the sky.
-    "levels": (30, 160),
+    "levels": (40, 170),
+    # Subject mask: pixels darker than `thresh` (hood, jacket) are the subject; a closing of
+    # `grow` px fills the face inside the hood; everything outside drops to paper.
+    # Set to None to skip masking. `gamma` < 1 lifts the face; `edge` scales line carving.
+    "mask": {"thresh": 70, "grow": 45, "soft": 2},
+    "gamma": 1.0,
+    "edge": 0.3,
     # Oval fade: (radius where it starts, how far it runs). Smaller = tighter.
-    "vignette": (0.62, 0.30),
+    "vignette": (0.85, 0.30),
 }
 
 # The three colour tiles. {repos} is filled in from data/github.json.
 TILES = [
-    {"slug": "build", "label": "Build", "big": "{repos} repos", "colour": "blue",
-     "body": "Websites, web apps and full-stack projects, all public on GitHub.",
-     "href": f"{GH}?tab=repositories"},
-    {"slug": "ship", "label": "Ship", "big": "4 live sites", "colour": "red",
+    {"slug": "build", "label": "Shipped", "big": "4 live sites", "colour": "blue",
      "body": "Edithsi, Weesize and the Finland and Switzerland labour guides, all deployed.",
-     "href": "https://edithsi.vercel.app"},
+     "href": f"{GH}?tab=repositories"},
+    {"slug": "ship", "label": "Private", "big": "0 uploads", "colour": "red",
+     "body": "Weesize resizes photos, signatures and PDFs in your browser. Free, open source.",
+     "href": "https://weesize.vercel.app"},
     {"slug": "reach", "label": "Reach", "big": "6 languages", "colour": "yellow",
-     "body": "Edithsi guides people through remote AI-training work in six languages.",
-     "href": f"{GH}/edithsi"},
+     "body": "Edithsi guides professionals into remote AI-training work, in six languages.",
+     "href": "https://edithsi.vercel.app"},
 ]
 
-# "What I'm coding": repos in order, shown three to a row. None uses your pinned repos.
-FEATURED = ["edithsi", "weesize", "labour-finland", "labour-switzerland",
-            "Expense_tracker_app_IU", "BookVerse"]
-# Short card descriptions (three lines max). Falls back to the GitHub description.
+# "What I'm coding": repos in order (strongest first), shown three to a row.
+FEATURED = ["weesize", "edithsi", "labour-finland", "labour-switzerland",
+            "Expense_tracker_app_IU"]
+# Short card descriptions (four lines max). Falls back to the GitHub description.
 DESCRIPTIONS = {
-    "edithsi": "An independent guide to remote AI-training work in Finland and Europe, "
-               "in six languages.",
-    "weesize": "Compress and resize photos, signatures and PDFs to the exact size a form "
-               "asks for. Runs in your browser.",
-    "labour-finland": "Independent wage and working-life information for Finland.",
-    "labour-switzerland": "Independent wage and working-life information for Switzerland.",
-    "Expense_tracker_app_IU": "A full-stack expense tracker built on the MERN stack.",
-    "BookVerse": "A website for browsing and discovering books.",
+    "weesize": "Shrinks photos, signatures and PDFs to the exact file size a form asks "
+               "for. Free, open source, never uploads your files.",
+    "edithsi": "Independent guide to remote AI-training work for professionals in Finland "
+               "and Europe, in six languages.",
+    "labour-finland": "Wages for 17 occupations, a pay calculator and 7 guides on working "
+                      "life in Finland.",
+    "labour-switzerland": "Work permits, wage benchmarks, a pay calculator and a 26-canton "
+                          "tax directory. EN, DE, FR.",
+    "Expense_tracker_app_IU": "Full-stack expense tracker on the MERN stack, with charts "
+                              "and email alerts when spending passes a limit.",
 }
+# Where a card links. Live products open the live site; the rest open the repo.
+LIVE = {"weesize": "https://weesize.vercel.app", "edithsi": "https://edithsi.vercel.app",
+        "labour-finland": "https://labour-finland.vercel.app",
+        "labour-switzerland": "https://labour-switzerland.vercel.app"}
 # Shown after the language on a repo card.
-HIGHLIGHTS = {"edithsi": "live site", "weesize": "live site",
-              "labour-finland": "live site", "labour-switzerland": "live site"}
+HIGHLIGHTS = {"weesize": "live · open source", "edithsi": "live site",
+              "labour-finland": "live site", "labour-switzerland": "live site",
+              "Expense_tracker_app_IU": "MERN"}
 
 FOOTER = [
+    ("Email me", "mailto:ansochacko@gmail.com"),
+    ("LinkedIn", "https://www.linkedin.com/in/anso-thattasseril-chacko-684a40160"),
     ("ansochacko.com", "https://ansochacko.com/"),
-    ("github", "https://github.com/Ansochacko"),
+    ("GitHub", "https://github.com/Ansochacko"),
 ]
 
 # --------------------------------------------------------------------------------------
@@ -449,12 +464,23 @@ def engraving(path, crop, x0, y0, bw, bh, gap=3.2, step=1.4):
     grey = ImageOps.autocontrast(im.convert("L"), cutoff=1)
     # Levels: anything lighter than `hi` turns to paper, so a busy background drops out.
     lo, hi = PROFILE.get("levels", (0, 255))
-    grey = grey.point(lambda v: max(0, min(255, round((v - lo) * 255 / (hi - lo)))))
+    mk = None
+    mcfg = PROFILE.get("mask")
+    if mcfg:
+        m = grey.point(lambda v: 255 if v < mcfg["thresh"] else 0)
+        gr = mcfg["grow"]
+        m = m.filter(ImageFilter.MaxFilter(gr)).filter(ImageFilter.MinFilter(gr - 4))
+        m = m.filter(ImageFilter.GaussianBlur(mcfg["soft"]))
+    gm = PROFILE.get("gamma", 1.0)
+    grey = grey.point(lambda v: round(255 * max(0.0, min(1.0, (v - lo) / (hi - lo))) ** gm))
     # Light outlines inside the dark clothing, so lapels and folds survive.
     edges = grey.filter(ImageFilter.GaussianBlur(1.5)).filter(ImageFilter.FIND_EDGES)
     cols, rows = int(bw / step), int(bh / gap)
     g = grey.resize((cols, rows), Image.LANCZOS).load()
     e = edges.resize((cols, rows), Image.LANCZOS).load()
+    if mcfg:
+        mk = m.resize((cols, rows), Image.LANCZOS).load()
+    edge_k = PROFILE.get("edge", 1.0)
 
     max_w, levels = gap * 0.8, 7
     paths = {}
@@ -465,14 +491,14 @@ def engraving(path, crop, x0, y0, bw, bh, gap=3.2, step=1.4):
         for i in range(cols + 1):
             if i < cols:
                 L = g[i, j]
-                dark = min(1.0, max(0.0, (222 - L) / 190)) ** 0.9
-                dark = max(0.0, dark - min(0.45, e[i, j] / 110))   # carve edges back out
+                dark = min(1.0, max(0.0, (230 - L) / 200)) ** 0.9
+                dark = max(0.0, dark - min(0.45, e[i, j] / 110) * edge_k)   # carve edges back out
                 # Oval vignette: full ink around the face, fading out towards the corners.
                 dx, dy = (i / cols - 0.5) / 0.5, (fy - 0.4) / 0.62
                 r = (dx * dx + dy * dy) ** 0.5
                 v0, v1 = PROFILE.get("vignette", (0.72, 0.32))
                 fade = 1.0 if r < v0 else max(0.0, 1 - (r - v0) / v1) ** 1.3
-                lvl = round(dark * fade * levels)
+                lvl = round(dark * fade * (mk[i, j] / 255 if mk else 1.0) * levels)
             else:
                 lvl = 0
             if lvl != cur:
@@ -744,7 +770,7 @@ def readme_block(d, repos, data):
     for r0 in range(0, len(repos), 3):
         lines.append('<p align="center">')
         for r in repos[r0:r0 + 3]:
-            lines.append(f'<a href="{r["url"]}"><img src="{d}/repo-{slug(r["name"])}.svg" '
+            lines.append(f'<a href="{LIVE.get(r["name"], r["url"])}"><img src="{d}/repo-{slug(r["name"])}.svg" '
                          f'width="32.8%" alt="{a(r["name"])}"></a>')
         lines += ["</p>", ""]
     lines.append('<p align="center">' + " / ".join(
