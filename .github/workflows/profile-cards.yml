@@ -47,6 +47,12 @@ jobs:
           path: .fontcache
           key: fonts-${{ hashFiles('render_cards.py') }}
 
+      - name: Fetch portrait (GitHub avatar) if none is committed
+        run: |
+          if [ ! -f assets/portrait.jpg ]; then
+            curl -sSfL "https://github.com/${{ github.repository_owner }}.png?size=800" -o assets/portrait.jpg
+          fi
+
       - name: Render cards
         run: |
           pip install --quiet fonttools pillow
@@ -56,7 +62,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/github.json cards README.md
+          git add data/github.json cards README.md assets
           if git diff --cached --quiet; then
             echo "Cards unchanged."
           else

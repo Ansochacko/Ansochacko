@@ -46,10 +46,11 @@ PROFILE = {
     "site": "ansochacko.com",
     "href": "https://ansochacko.com/",
     # Drawn as a line engraving. Any portrait on a plain light background works best.
-    # Drop a photo at assets/portrait.jpg; until then the hero card is text only.
+    # The workflow saves your GitHub avatar here; replace the file to use another photo.
     "portrait": ROOT / "assets" / "portrait.jpg",
     # Crop box as fractions of the image (left, top, right, bottom): head and shoulders.
-    "crop": (0.10, 0.0, 0.90, 0.85),
+    # Keep width/height near 0.92 (the portrait frame's shape) so the face isn't stretched.
+    "crop": (0.11, 0.04, 0.89, 0.89),
 }
 
 # The three colour tiles. {repos} is filled in from data/github.json.
