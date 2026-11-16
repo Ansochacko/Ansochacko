@@ -41,8 +41,8 @@ PROFILE = {
     "first": "Anso",
     "last": "Chacko",
     "label": "Builder · websites & web apps",
-    "line": "I build websites and web apps, from independent guides to working life in "
-            "Europe to privacy-first browser tools, and ship them.",
+    "line": "I build websites and web apps: guides to working life in Europe and "
+            "privacy-first browser tools.",
     "site": "ansochacko.com",
     "href": "https://ansochacko.com/",
     # Drawn as a line engraving. Any portrait on a plain light background works best.
@@ -51,6 +51,10 @@ PROFILE = {
     # Crop box as fractions of the image (left, top, right, bottom): head and shoulders.
     # Keep width/height near 0.92 (the portrait frame's shape) so the face isn't stretched.
     "crop": (0.11, 0.04, 0.89, 0.89),
+    # Tone levels (black point, white point). Raise the white point to fade out the sky.
+    "levels": (30, 160),
+    # Oval fade: (radius where it starts, how far it runs). Smaller = tighter.
+    "vignette": (0.62, 0.30),
 }
 
 # The three colour tiles. {repos} is filled in from data/github.json.
@@ -443,6 +447,9 @@ def engraving(path, crop, x0, y0, bw, bh, gap=3.2, step=1.4):
     l, t, r, b = crop
     im = im.crop((int(l * im.width), int(t * im.height), int(r * im.width), int(b * im.height)))
     grey = ImageOps.autocontrast(im.convert("L"), cutoff=1)
+    # Levels: anything lighter than `hi` turns to paper, so a busy background drops out.
+    lo, hi = PROFILE.get("levels", (0, 255))
+    grey = grey.point(lambda v: max(0, min(255, round((v - lo) * 255 / (hi - lo)))))
     # Light outlines inside the dark clothing, so lapels and folds survive.
     edges = grey.filter(ImageFilter.GaussianBlur(1.5)).filter(ImageFilter.FIND_EDGES)
     cols, rows = int(bw / step), int(bh / gap)
@@ -463,7 +470,8 @@ def engraving(path, crop, x0, y0, bw, bh, gap=3.2, step=1.4):
                 # Oval vignette: full ink around the face, fading out towards the corners.
                 dx, dy = (i / cols - 0.5) / 0.5, (fy - 0.4) / 0.62
                 r = (dx * dx + dy * dy) ** 0.5
-                fade = 1.0 if r < 0.72 else max(0.0, 1 - (r - 0.72) / 0.32) ** 1.3
+                v0, v1 = PROFILE.get("vignette", (0.72, 0.32))
+                fade = 1.0 if r < v0 else max(0.0, 1 - (r - v0) / v1) ** 1.3
                 lvl = round(dark * fade * levels)
             else:
                 lvl = 0
