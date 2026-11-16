@@ -40,56 +40,82 @@ GH = "https://github.com/Ansochacko"
 PROFILE = {
     "first": "Anso",
     "last": "Chacko",
-    "label": "Builder · websites & web apps",
-    "line": "I build websites and web apps: guides to working life in Europe and "
-            "privacy-first browser tools.",
+    "label": "AI & web developer · Finland & Europe",
+    # Two lines at most (about 100 characters) next to the portrait.
+    "line": "I build independent guides to work and pay in Europe, and browser tools "
+            "that never upload your files.",
     "site": "ansochacko.com",
     "href": "https://ansochacko.com/",
-    # Drawn as a line engraving. Any portrait on a plain light background works best.
-    # The workflow saves your GitHub avatar here; replace the file to use another photo.
-    "portrait": ROOT / "assets" / "portrait.jpg",
+    # Drawn as a line engraving; a portrait on plain white works best.
+    # portrait-engraving.png is the GitHub avatar (assets/portrait.jpg, saved by the
+    # workflow) with the sky and sea cut away and the face tones opened up. Delete it to
+    # fall back to portrait.jpg, then retune crop and levels.
+    "portrait": next((f for f in (ROOT / "assets" / "portrait-engraving.png",
+                                  ROOT / "assets" / "portrait.jpg") if f.exists()), None),
     # Crop box as fractions of the image (left, top, right, bottom): head and shoulders.
     # Keep width/height near 0.92 (the portrait frame's shape) so the face isn't stretched.
-    "crop": (0.11, 0.04, 0.89, 0.89),
-    # Tone levels (black point, white point). Raise the white point to fade out the sky.
-    "levels": (30, 160),
+    "crop": (0.09, 0.21, 0.71, 0.885),
+    # Tone levels (black point, white point). A lower white point lightens the face.
+    "levels": (0, 255),
     # Oval fade: (radius where it starts, how far it runs). Smaller = tighter.
-    "vignette": (0.62, 0.30),
+    "vignette": (0.72, 0.32),
+    # Engraving line spacing and horizontal sample step, in px. Smaller = more detail,
+    # larger file.
+    "gap": 2.4,
+    "step": 1.1,
 }
 
-# The three colour tiles. {repos} is filled in from data/github.json.
+# Section headings: (upright words, italic words). The italic words are set in the accent.
+HEAT_TITLE = ("Built ", "in the open")
+CODING_TITLE = ("Selected ", "work")
+
+# The three colour tiles. "colour" is a key of C below; the text turns dark on a light
+# colour by itself. {repos} in "big" or "body" is filled in from data/github.json.
 TILES = [
-    {"slug": "build", "label": "Build", "big": "{repos} repos", "colour": "blue",
-     "body": "Websites, web apps and full-stack projects, all public on GitHub.",
-     "href": f"{GH}?tab=repositories"},
-    {"slug": "ship", "label": "Ship", "big": "4 live sites", "colour": "red",
-     "body": "Edithsi, Weesize and the Finland and Switzerland labour guides, all deployed.",
-     "href": "https://edithsi.vercel.app"},
-    {"slug": "reach", "label": "Reach", "big": "6 languages", "colour": "yellow",
-     "body": "Edithsi guides people through remote AI-training work in six languages.",
-     "href": f"{GH}/edithsi"},
+    {"slug": "guides", "label": "Independent", "big": "3 guides", "colour": "fjord",
+     "body": "Edithsi, Labour Finland and Labour Switzerland: work, pay and permits, "
+             "explained.",
+     "href": "https://labourfinland.com/"},
+    {"slug": "private", "label": "Private by design", "big": "0 uploads", "colour": "lingon",
+     "body": "Weesize shrinks photos and PDFs to a form's size limit, on your own device.",
+     "href": "https://weesize.com/"},
+    {"slug": "languages", "label": "Multilingual", "big": "6 languages",
+     "colour": "cloudberry",
+     "body": "Edithsi in English, Finnish, Swedish, German, French and Spanish.",
+     "href": "https://edithsi.com/"},
 ]
 
-# "What I'm coding": repos in order, shown three to a row. None uses your pinned repos.
-FEATURED = ["edithsi", "weesize", "labour-finland", "labour-switzerland",
-            "Expense_tracker_app_IU", "BookVerse"]
-# Short card descriptions (three lines max). Falls back to the GitHub description.
+# Repo cards in order, shown three to a row. None uses your pinned repos.
+FEATURED = ["weesize", "edithsi", "labour-finland", "labour-switzerland",
+            "Expense_tracker_app_IU", "Portfolio"]
+# Short card descriptions (four lines max). Falls back to the GitHub description.
 DESCRIPTIONS = {
-    "edithsi": "An independent guide to remote AI-training work in Finland and Europe, "
-               "in six languages.",
-    "weesize": "Compress and resize photos, signatures and PDFs to the exact size a form "
-               "asks for. Runs in your browser.",
-    "labour-finland": "Independent wage and working-life information for Finland.",
-    "labour-switzerland": "Independent wage and working-life information for Switzerland.",
-    "Expense_tracker_app_IU": "A full-stack expense tracker built on the MERN stack.",
-    "BookVerse": "A website for browsing and discovering books.",
+    "edithsi": "Independent guide to remote AI-training work for professionals in Finland "
+               "and Europe: roles, pay and platforms, in six languages.",
+    "weesize": "Shrinks photos, signatures and PDFs to the exact file size a form asks for. "
+               "Runs in your browser; nothing is uploaded.",
+    "labour-finland": "Collective-agreement pay for 17 occupations, a gross-pay calculator "
+                      "and guides to Finnish working life, with sources.",
+    "labour-switzerland": "Swiss work permits, pay benchmarks, a gross-pay calculator and "
+                          "cantonal tax, explained in English, German and French.",
+    "Expense_tracker_app_IU": "MERN expense tracker with spending charts and a cron service "
+                              "that emails you when spending passes a limit.",
+    "Portfolio": "My personal site, built as a HUD-style terminal in plain HTML, CSS "
+                 "and JavaScript.",
 }
 # Shown after the language on a repo card.
-HIGHLIGHTS = {"edithsi": "live site", "weesize": "live site",
-              "labour-finland": "live site", "labour-switzerland": "live site"}
+HIGHLIGHTS = {"weesize": "weesize.com  ·  MIT", "edithsi": "edithsi.com",
+              "labour-finland": "labourfinland.com",
+              "labour-switzerland": "labourswitzerland.com",
+              "Expense_tracker_app_IU": "MERN stack", "Portfolio": "ansochacko.com"}
+# Where a repo card links: live products open the live site, the rest open the repo.
+LIVE = {"weesize": "https://weesize.com/", "edithsi": "https://edithsi.com/",
+        "labour-finland": "https://labourfinland.com/",
+        "labour-switzerland": "https://labourswitzerland.com/"}
 
 FOOTER = [
     ("ansochacko.com", "https://ansochacko.com/"),
+    ("linkedin", "https://www.linkedin.com/in/anso-thattasseril-chacko-684a40160"),
     ("github", "https://github.com/Ansochacko"),
 ]
 
@@ -97,20 +123,24 @@ FOOTER = [
 # Look
 # --------------------------------------------------------------------------------------
 C = {
-    "bg": "#f4f3ef",          # paper
-    "ink": "#121212",
-    "body": "#3b3a36",
-    "muted": "#7a7870",
-    "line": "#e3e1da",
-    "faint": "#cfccc3",       # the month still in progress
-    "blue": "#2e54ff",
-    "red": "#ec3a25",
-    "yellow": "#fdc626",
-    "engrave": "#2a2925",
+    "bg": "#f3f4f1",          # paper, a cool birch white
+    "ink": "#13171a",
+    "body": "#363c3f",
+    "muted": "#646b6e",       # 4.9:1 on the paper
+    "line": "#dfe3e0",
+    "faint": "#c9d0ce",       # the month still in progress
+    "accent": "#1a6470",      # fjord: name square, arrows, best month, italic heading words
+    # Tile and dot colours: fjord, lingonberry, cloudberry.
+    "fjord": "#1a6470",       # white text 6.8:1
+    "lingon": "#a8263c",      # white text 7.0:1
+    "cloudberry": "#eba93c",  # ink text 8.7:1
+    "engrave": "#1d2427",
     "gh_dark": "#f0f6fc",     # heading text on GitHub's dark theme
     "gh_light": "#1f2328",    # and on the light theme
+    "gh_dark_accent": "#7fc4cc",    # italic heading words on dark (9.6:1 on #0d1117)
+    "gh_light_accent": "#1a6470",   # and on light (6.8:1 on #ffffff)
 }
-HEAT = ["#e0e2ef", "#b9c4fb", "#8299ff", "#4c6aff", "#1d3bd1"]   # less -> more
+HEAT = ["#e1e6e3", "#b6d5d6", "#7db4ba", "#3f8791", "#155663"]   # less -> more: ice to fjord
 
 GF = "https://raw.githubusercontent.com/google/fonts/main/ofl/"
 INTER = GF + "inter/Inter%5Bopsz%2Cwght%5D.ttf"
@@ -374,6 +404,14 @@ class Card:
                 f"{self.frame()}{''.join(self.parts)}</svg>")
 
 
+def is_light(hex_colour):
+    """True when dark text reads better than white on this colour (WCAG luminance)."""
+    r, g, b = (int(hex_colour.lstrip("#")[i:i + 2], 16) / 255 for i in (0, 2, 4))
+    lin = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in (r, g, b)]
+    lum = 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2]
+    return (lum + 0.05) / 0.05 > 1.05 / (lum + 0.05)     # contrast with black > with white
+
+
 def arrow(card, x, y, colour, at):
     """A small north-east arrow whose tip is at (x, y)."""
     card.add(f'<g{card.anim("nudge", at)}><path d="M{x - 9} {y + 9} L{x} {y} M{x - 6.5} {y} '
@@ -495,7 +533,8 @@ def card_hero():
     H = 384
     card = Card(W, H, f"{p['first']} {p['last']}. {p['line']}", T_HERO)
     px, py, pw, ph = 500, 22, 312, H - 44
-    art = engraving(p.get("portrait"), p.get("crop", (0, 0, 1, 1)), px, py, pw, ph)
+    art = engraving(p.get("portrait"), p.get("crop", (0, 0, 1, 1)), px, py, pw, ph,
+                    gap=p.get("gap", 3.2), step=p.get("step", 1.4))
     text_w = (px - PAD - 20) if art else (W - 2 * PAD)
     x = PAD
 
@@ -506,7 +545,7 @@ def card_hero():
             card.add(f'<rect x="{px - 2}" y="{py - 2}" width="{pw + 4}" height="{ph + 4}" '
                      f'fill="{C["bg"]}"{card.anim("wipe", 0.15)}/>')
 
-    card.add(f'<rect x="{x}" y="50" width="7" height="7" fill="{C["blue"]}"'
+    card.add(f'<rect x="{x}" y="50" width="7" height="7" fill="{C["accent"]}"'
              f'{card.anim("pop", 0)}/>')
     card.label(x + 16, 57.5, p["label"], C["muted"], at=0.05)
 
@@ -532,7 +571,7 @@ def card_hero():
     sw = face("k").width(p["site"], 12)
     card.add(f'<line x1="{x}" x2="{x + sw:.1f}" y1="356.5" y2="356.5" stroke="{C["ink"]}" '
              f'stroke-width=".8"{card.anim("fade", 0.8)}/>')
-    arrow(card, x + sw + 16, 343, C["blue"], 0.9)
+    arrow(card, x + sw + 16, 343, C["accent"], 0.9)
     return card
 
 
@@ -546,8 +585,9 @@ def card_heat(data):
     H = int(bottom + 52)
     card = Card(W, H, f"Contribution graph: {plural(data['total'], 'contribution')} "
                       f"in the last year, refreshed daily", T_HEAT)
-    card.runs(PAD, 70, [card.run("Every day, ", "g", 36, C["ink"], ls=-0.4),
-                        card.run("in blue", "i", 36, C["blue"], ls=-0.4)], kind="rise", at=0)
+    card.runs(PAD, 70, [card.run(HEAT_TITLE[0], "g", 36, C["ink"], ls=-0.4),
+                        card.run(HEAT_TITLE[1], "i", 36, C["accent"], ls=-0.4)],
+              kind="rise", at=0)
     card.label(W - PAD, 66, "Refreshed daily", C["muted"], anchor="end", at=0.1)
 
     nonzero = sorted(c for _, c in data["days"] if c)
@@ -615,7 +655,7 @@ def card_monthly(data):
                          card.run(" contributions", "i", 54, C["ink"], ls=-0.8)],
               kind="rise", at=0.05)
 
-    # Bars: ink, the best month in blue, the month in progress pale.
+    # Bars: ink, the best month in the accent, the month in progress pale.
     x0, x1, base, top = PAD, 524, 292, 168
     slot = (x1 - x0) / 12
     bw = slot * 0.74
@@ -625,14 +665,14 @@ def card_monthly(data):
         h = max(2.0, (base - top) * v / peak) if v else 0
         cx = x0 + slot * i + slot / 2
         is_cur, is_peak = i == len(months) - 1, v == peak and v
-        fill = C["faint"] if is_cur else (C["blue"] if is_peak else C["ink"])
+        fill = C["faint"] if is_cur else (C["accent"] if is_peak else C["ink"])
         at = 0.25 + i * 0.05
         if h:
             card.add(f'<rect x="{cx - bw / 2:.1f}" y="{base - h:.1f}" width="{bw:.1f}" '
                      f'height="{h:.1f}" rx="1.5" fill="{fill}"{card.anim("grow", at)}>'
                      f'<title>{esc(plural(v, "contribution"))}</title></rect>')
         if is_peak:
-            card.text(cx, base - h - 9, f"{v:,}", "k", 11, C["blue"], anchor="middle",
+            card.text(cx, base - h - 9, f"{v:,}", "k", 11, C["accent"], anchor="middle",
                       kind="fade", at=at + 0.5)
         mname = dt.date(key[0], key[1], 1).strftime("%b")
         card.text(cx, base + 22, mname, "k", 10, C["muted"], anchor="middle", kind="fade", at=at)
@@ -663,10 +703,12 @@ def card_monthly(data):
 def card_tile(tile, i, data):
     TH = 184
     colour = C[tile["colour"]]
-    fg = C["ink"] if tile["colour"] == "yellow" else "#ffffff"
-    soft = "#3b3209" if tile["colour"] == "yellow" else "#ffffffd9"
+    light = is_light(colour)
+    fg = C["ink"] if light else "#ffffff"
+    soft = C["ink"] + "cc" if light else "#ffffffd9"
     big = tile["big"].format(repos=data["public"])
-    card = Card(TW, TH, f"{tile['label']}: {big}. {tile['body']}", T_TILES + 0.1 * i,
+    body = tile["body"].format(repos=data["public"])
+    card = Card(TW, TH, f"{tile['label']}: {big}. {body}", T_TILES + 0.1 * i,
                 bg=colour, stroke="")
     card.label(22, 38, tile["label"], soft, at=0)
     arrow(card, TW - 22, 29, fg, 0.3)
@@ -674,19 +716,19 @@ def card_tile(tile, i, data):
     while size > 26 and face("i").width(big, size, -0.6) > TW - 44:
         size -= 1
     card.text(22, 104, big, "i", size, fg, ls=-0.6, kind="rise", at=0.05)
-    for n, ln in enumerate(wrap(clean(tile["body"]), "r", 12.5, TW - 44)[:3]):
+    for n, ln in enumerate(wrap(clean(body), "r", 12.5, TW - 44)[:3]):
         card.text(22, 134 + n * 17.5, ln, "r", 12.5, fg, kind="rise", at=0.12 + n * 0.04)
     return card
 
 
-def card_heading(start, italic, fill, t0):
+def card_heading(start, italic, fill, accent, t0):
     card = Card(W, 64, start + italic, t0, bg="", stroke="")
     card.runs(2, 46, [card.run(start, "g", 34, fill, ls=-0.4),
-                      card.run(italic, "i", 34, fill, ls=-0.4)], kind="rise", at=0)
+                      card.run(italic, "i", 34, accent, ls=-0.4)], kind="rise", at=0)
     return card
 
 
-DOTS = ["blue", "red", "yellow"]
+DOTS = ["fjord", "lingon", "cloudberry"]
 
 
 def card_repo(repo, i):
@@ -732,20 +774,26 @@ def readme_block(d, repos, data):
     ]
     for t in TILES:
         big = t["big"].format(repos=data["public"])
+        body = t["body"].format(repos=data["public"])
         lines.append(f'<a href="{t["href"]}"><img src="{d}/tile-{t["slug"]}.svg" width="32.8%" '
-                     f'alt="{a(t["label"])}: {a(big)}. {a(t["body"])}"></a>')
+                     f'alt="{a(t["label"])}: {a(big)}. {a(body)}"></a>')
     lines += [
         "</p>", "",
         "<picture>",
         f'<source media="(prefers-color-scheme: dark)" srcset="{d}/heading-coding-dark.svg">',
-        f'<img src="{d}/heading-coding-light.svg" width="100%" alt="What I\'m coding">',
+        f'<img src="{d}/heading-coding-light.svg" width="100%" '
+        f'alt="{a("".join(CODING_TITLE))}">',
         "</picture>", "",
     ]
     for r0 in range(0, len(repos), 3):
         lines.append('<p align="center">')
         for r in repos[r0:r0 + 3]:
-            lines.append(f'<a href="{r["url"]}"><img src="{d}/repo-{slug(r["name"])}.svg" '
-                         f'width="32.8%" alt="{a(r["name"])}"></a>')
+            desc = re.sub(r"\s+", " ", DESCRIPTIONS.get(r["name"]) or r.get("description")
+                          or "").strip()
+            alt = f'{r["name"]}: {desc}' if desc else r["name"]
+            href = LIVE.get(r["name"], r["url"])
+            lines.append(f'<a href="{href}"><img src="{d}/repo-{slug(r["name"])}.svg" '
+                         f'width="32.8%" alt="{a(alt)}"></a>')
         lines += ["</p>", ""]
     lines.append('<p align="center">' + " / ".join(
         f'<a href="{href}">{a(text)}</a>' for text, href in FOOTER) + "</p>")
@@ -766,8 +814,8 @@ def main():
     for i, t in enumerate(TILES):
         cards[f"tile-{t['slug']}"] = card_tile(t, i, data)
     for mode in ("dark", "light"):
-        cards[f"heading-coding-{mode}"] = card_heading("What I'm ", "coding",
-                                                      C[f"gh_{mode}"], T_HEADING)
+        cards[f"heading-coding-{mode}"] = card_heading(*CODING_TITLE, C[f"gh_{mode}"],
+                                                      C[f"gh_{mode}_accent"], T_HEADING)
     for i, r in enumerate(repos):
         cards[f"repo-{slug(r['name'])}"] = card_repo(r, i)
 
