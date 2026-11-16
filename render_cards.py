@@ -40,56 +40,73 @@ GH = "https://github.com/Ansochacko"
 PROFILE = {
     "first": "Anso",
     "last": "Chacko",
-    "label": "Builder · websites & web apps",
-    "line": "I build websites and web apps: guides to working life in Europe and "
-            "privacy-first browser tools.",
+    "label": "AI & web developer · Finland",
+    # Two lines at most (about 100 characters) next to the portrait.
+    "line": "I build independent guides to work and pay in Europe, and browser tools "
+            "that never upload your files.",
     "site": "ansochacko.com",
     "href": "https://ansochacko.com/",
-    # Drawn as a line engraving. Any portrait on a plain light background works best.
-    # The workflow saves your GitHub avatar here; replace the file to use another photo.
-    "portrait": ROOT / "assets" / "portrait.jpg",
+    # Drawn as a line engraving. A portrait on a plain white background works best.
+    # portrait-engraving.png is assets/portrait.jpg (the GitHub avatar the workflow saves)
+    # with the sky and sea cut away and the face tones opened up. Delete it to fall back
+    # to portrait.jpg, then retune crop and levels.
+    "portrait": next((f for f in (ROOT / "assets" / "portrait-engraving.png",
+                                  ROOT / "assets" / "portrait.jpg") if f.exists()), None),
     # Crop box as fractions of the image (left, top, right, bottom): head and shoulders.
     # Keep width/height near 0.92 (the portrait frame's shape) so the face isn't stretched.
-    "crop": (0.11, 0.04, 0.89, 0.89),
+    "crop": (0.09, 0.21, 0.71, 0.885),
     # Tone levels (black point, white point). Raise the white point to fade out the sky.
-    "levels": (30, 160),
+    "levels": (0, 255),
     # Oval fade: (radius where it starts, how far it runs). Smaller = tighter.
-    "vignette": (0.62, 0.30),
+    "vignette": (0.72, 0.32),
+    # Engraving line spacing and horizontal sample step, in px. Smaller = more detail.
+    "gap": 2.4,
+    "step": 1.1,
 }
 
 # The three colour tiles. {repos} is filled in from data/github.json.
 TILES = [
-    {"slug": "build", "label": "Build", "big": "{repos} repos", "colour": "blue",
-     "body": "Websites, web apps and full-stack projects, all public on GitHub.",
+    {"slug": "build", "label": "Build", "big": "{repos} public repos", "colour": "blue",
+     "body": "Astro, Next.js and Vite projects in TypeScript, plus a MERN app and plain "
+             "HTML sites.",
      "href": f"{GH}?tab=repositories"},
     {"slug": "ship", "label": "Ship", "big": "4 live sites", "colour": "red",
-     "body": "Edithsi, Weesize and the Finland and Switzerland labour guides, all deployed.",
-     "href": "https://edithsi.vercel.app"},
+     "body": "Weesize, Edithsi and labour guides for Finland and Switzerland, "
+             "each on its own domain.",
+     "href": "https://weesize.com/"},
     {"slug": "reach", "label": "Reach", "big": "6 languages", "colour": "yellow",
-     "body": "Edithsi guides people through remote AI-training work in six languages.",
-     "href": f"{GH}/edithsi"},
+     "body": "Edithsi in English, Finnish, Swedish, German, French and Spanish.",
+     "href": "https://edithsi.com/"},
 ]
 
 # "What I'm coding": repos in order, shown three to a row. None uses your pinned repos.
-FEATURED = ["edithsi", "weesize", "labour-finland", "labour-switzerland",
-            "Expense_tracker_app_IU", "BookVerse"]
-# Short card descriptions (three lines max). Falls back to the GitHub description.
+FEATURED = ["weesize", "edithsi", "labour-finland", "labour-switzerland",
+            "Expense_tracker_app_IU", "Portfolio"]
+# Short card descriptions (four lines, about 120 characters, max).
+# Falls back to the GitHub description.
 DESCRIPTIONS = {
-    "edithsi": "An independent guide to remote AI-training work in Finland and Europe, "
-               "in six languages.",
-    "weesize": "Compress and resize photos, signatures and PDFs to the exact size a form "
-               "asks for. Runs in your browser.",
-    "labour-finland": "Independent wage and working-life information for Finland.",
-    "labour-switzerland": "Independent wage and working-life information for Switzerland.",
-    "Expense_tracker_app_IU": "A full-stack expense tracker built on the MERN stack.",
-    "BookVerse": "A website for browsing and discovering books.",
+    "weesize": "Shrinks photos, signatures and PDFs to the exact file size a form asks for, "
+               "in your browser. Nothing is uploaded.",
+    "edithsi": "A guide to remote AI-training work for lawyers, clinicians, engineers, "
+               "linguists and other specialists in Finland and Europe.",
+    "labour-finland": "Collective-agreement wage tables, guides to work permits, student jobs "
+                      "and tax cards, and a salary calculator.",
+    "labour-switzerland": "Permits, cantonal minimum wages, withholding tax and a gross-pay "
+                          "calculator, in English, German and French.",
+    "Expense_tracker_app_IU": "Log and chart expenses in React, with an Express and MongoDB "
+                              "API and an email alert past a set limit.",
+    "Portfolio": "My personal site, built as a HUD-style terminal in plain HTML, CSS "
+                 "and JavaScript.",
 }
-# Shown after the language on a repo card.
-HIGHLIGHTS = {"edithsi": "live site", "weesize": "live site",
-              "labour-finland": "live site", "labour-switzerland": "live site"}
+# Shown after the language on a repo card: where it runs, or what it is built on.
+HIGHLIGHTS = {"weesize": "weesize.com", "edithsi": "edithsi.com",
+              "labour-finland": "labourfinland.com",
+              "labour-switzerland": "labourswitzerland.com",
+              "Expense_tracker_app_IU": "MERN stack", "Portfolio": "ansochacko.com"}
 
 FOOTER = [
     ("ansochacko.com", "https://ansochacko.com/"),
+    ("linkedin", "https://www.linkedin.com/in/anso-thattasseril-chacko-684a40160"),
     ("github", "https://github.com/Ansochacko"),
 ]
 
@@ -495,7 +512,8 @@ def card_hero():
     H = 384
     card = Card(W, H, f"{p['first']} {p['last']}. {p['line']}", T_HERO)
     px, py, pw, ph = 500, 22, 312, H - 44
-    art = engraving(p.get("portrait"), p.get("crop", (0, 0, 1, 1)), px, py, pw, ph)
+    art = engraving(p.get("portrait"), p.get("crop", (0, 0, 1, 1)), px, py, pw, ph,
+                    gap=p.get("gap", 3.2), step=p.get("step", 1.4))
     text_w = (px - PAD - 20) if art else (W - 2 * PAD)
     x = PAD
 
@@ -744,8 +762,11 @@ def readme_block(d, repos, data):
     for r0 in range(0, len(repos), 3):
         lines.append('<p align="center">')
         for r in repos[r0:r0 + 3]:
+            desc = re.sub(r"\s+", " ", DESCRIPTIONS.get(r["name"]) or r.get("description")
+                          or "").strip()
+            alt = f'{r["name"]}: {desc}' if desc else r["name"]
             lines.append(f'<a href="{r["url"]}"><img src="{d}/repo-{slug(r["name"])}.svg" '
-                         f'width="32.8%" alt="{a(r["name"])}"></a>')
+                         f'width="32.8%" alt="{a(alt)}"></a>')
         lines += ["</p>", ""]
     lines.append('<p align="center">' + " / ".join(
         f'<a href="{href}">{a(text)}</a>' for text, href in FOOTER) + "</p>")
